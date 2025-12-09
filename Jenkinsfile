@@ -7,11 +7,9 @@ pipeline {
     }
 
     stages {
-
-        stage('Checkout') {
+        stage('Checkout SCM') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/maysseem/demo-maven.git'
+                checkout scm
             }
         }
 
@@ -23,7 +21,21 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t demo-maven .'
+                bat 'docker build -t maysseem/demo-maven:latest .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub',
+                                                 usernameVariable: 'USERNAME',
+                                                 passwordVariable: 'PASSWORD')]) {
+                    bat """
+                        echo Logging into Docker Hub...
+                        docker login -u %USERNAME% -p %PASSWORD%
+                        docker push maysseem/demo-maven:latest
+                    """
+                }
             }
         }
     }
