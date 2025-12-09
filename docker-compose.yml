@@ -1,0 +1,6 @@
+services:
+  app:
+    image: maysseem/demo-maven:latest
+    container_name: demo-compose-app
+    ports:
+      - "8080:8080"
